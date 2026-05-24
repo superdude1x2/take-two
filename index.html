@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Enable Web App mode -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<!-- Status bar style: default, black, or black-translucent -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- The name that appears on the Home Screen -->
+<meta name="apple-mobile-web-app-title" content="NEON SURVIVOR">
+
+<!-- Add a home screen icon (provide a 180x180 png) -->
+<link rel="apple-touch-icon" href="Pictures/lethal_orbit.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -989,7 +998,7 @@ function setMode(mode) {
 }
 
 // MULTIPLIER TO ZOOM OUT MAP VIEW
-const ZOOM_FACTOR = 2.00;
+const ZOOM_FACTOR = 1.50;
 
 function applyMode() {
     const wrap = document.getElementById('canvas-wrap');
