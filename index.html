@@ -476,7 +476,8 @@
                 <div id="archive-desc" style="font-size:12px; color:#aac; line-height:1.5; margin-bottom: 10px;">...</div>
                 <div style="border-top: 1px solid var(--border); width: 100%; margin: 8px 0;"></div>
                 <div style="font-family:'Orbitron', sans-serif; font-size:11px; color:var(--amber); margin-bottom:3px;">EVOLUTION PROTOCOL</div>
-                <div id="archive-evo-desc" style="font-size:11px; color:#ffaa00; line-height:1.4;">...</div>
+           <div id="archive-evo-desc" style="font-size:11px; color:#ffaa00; line-height:1.4; margin-bottom: 10px;">...</div>
+                <button id="archive-evo-toggle" class="meta-btn" style="width: 100%; padding: 5px; font-size: 10px;" onclick="toggleArchiveEvo()">VIEW EVOLVED</button>
             </div>
         </div>
 
@@ -663,6 +664,7 @@ const bestiaryDB = [
 ];
 
 let previewArchiveId = archiveDB[0].id;
+let viewingEvolvedInArchive = false;
 let previewBestiaryId = bestiaryDB[0].id;
 let aFrame = 0, bFrame = 0, aCtx, bCtx;
 
@@ -704,6 +706,7 @@ function renderArchive() {
 
 function previewArchive(id) {
     previewArchiveId = id;
+    viewingEvolvedInArchive = false; // Reset the toggle when clicking a new ability
     let item = archiveDB.find(a => a.id === id);
     let isSeen = meta.seenAbils[item.id] && meta.seenAbils[item.id].base;
     let hasEvoData = meta.seenAbils[item.id] && meta.seenAbils[item.id].evo;
@@ -711,7 +714,36 @@ function previewArchive(id) {
     document.getElementById('archive-name').innerText = isSeen ? item.name : 'UNKNOWN ABILITY';
     document.getElementById('archive-desc').innerText = isSeen ? item.desc : 'Combat data missing. Acquire this ability in orbit to reveal its properties.';
     document.getElementById('archive-evo-desc').innerText = hasEvoData ? item.evoDesc : (item.hasEvo ? 'Evolution data locked.' : 'No known evolution.');
+    
+    let toggleBtn = document.getElementById('archive-evo-toggle');
+    if (hasEvoData) {
+        toggleBtn.disabled = false;
+        toggleBtn.innerText = 'VIEW EVOLVED';
+        toggleBtn.style.opacity = '1';
+        toggleBtn.style.borderColor = 'var(--amber)';
+        toggleBtn.style.color = 'var(--amber)';
+    } else {
+        toggleBtn.disabled = true;
+        toggleBtn.innerText = item.hasEvo ? 'EVOLUTION LOCKED (LVL 10)' : 'NO EVOLUTION';
+        toggleBtn.style.opacity = '0.3';
+        toggleBtn.style.borderColor = 'var(--border)';
+        toggleBtn.style.color = '#aac';
+    }
     renderArchive();
+}
+
+function toggleArchiveEvo() {
+    viewingEvolvedInArchive = !viewingEvolvedInArchive;
+    let toggleBtn = document.getElementById('archive-evo-toggle');
+    if (viewingEvolvedInArchive) {
+        toggleBtn.innerText = 'VIEW NORMAL';
+        toggleBtn.style.borderColor = 'var(--cyan)';
+        toggleBtn.style.color = 'var(--cyan)';
+    } else {
+        toggleBtn.innerText = 'VIEW EVOLVED';
+        toggleBtn.style.borderColor = 'var(--amber)';
+        toggleBtn.style.color = 'var(--amber)';
+    }
 }
 
 function renderBestiary() {
@@ -750,8 +782,8 @@ function archiveLoop() {
         aCtx.clearRect(0, 0, 200, 200);
         let cx = 100, cy = 100;
         
-        let isSeen = meta.seenAbils[previewArchiveId];
-        let isEvo = isSeen && isSeen.evo;
+ let isSeen = meta.seenAbils[previewArchiveId];
+        let isEvo = isSeen && isSeen.evo && viewingEvolvedInArchive;
 
         aCtx.save();
         
