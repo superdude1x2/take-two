@@ -162,6 +162,7 @@
     }
     
     .hud-panel { background: rgba(0, 10, 25, 0.8); border: 1px solid rgba(0, 245, 255, 0.3); padding: 5px 10px; font-size: 14px; }
+#level-score { min-width: 150px; text-align: center; }
     
     #hp-container { display: flex; align-items: center; justify-content: center; width: 200px; height: 25px; background: rgba(255, 34, 85, 0.1); border: 1px solid var(--red); position: relative; }
     #hp-bar { position: absolute; left: 0; top: 0; height: 100%; background: rgba(255, 34, 85, 0.6); z-index: 1; transition: width 0.2s; }
@@ -704,7 +705,7 @@ let hudDataVisible = true;
      accel: 0.2, friction: 0.92,
      fireTimer: 0, fireRate: 100,
      multishotCount: 1, orbitalAngle: 0, orbitalDist: 65,
-     subShieldDist: 32, magnetRadius: 50, magnetUpgrades: 0, spinRate: 0.07
+    subShieldDist: 32, magnetRadius: 50 + (meta.magLvl * 10), magnetUpgrades: 0, spinRate: 0.07
  };
 
 // -- DATABASES FOR ARCHIVE & BESTIARY --
