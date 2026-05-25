@@ -2919,9 +2919,8 @@ function checkLevelUpQueue() {
         });
         
         // THIS ANIMATION BLOCK IS ALSO CRITICAL
-  let overlay = document.getElementById('level-up');
-overlay.style.display = 'flex';
-        overlay.style.display = 'block';
+        let overlay = document.getElementById('level-up');
+        overlay.style.display = 'flex';
         overlay.style.animation = 'none';
         overlay.offsetHeight; 
         overlay.style.animation = 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards';
@@ -2930,10 +2929,9 @@ overlay.style.display = 'flex';
 
 function die() {
     gameActive = false; saveMeta(); checkAchievements();
-   let shop = document.getElementById('meta-shop');
+let shop = document.getElementById('meta-shop');
 shop.style.display = 'flex';
-    shop.style.display = 'block'; 
-    shop.style.animation = 'none'; shop.offsetHeight; shop.style.animation = 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.05) forwards';
+shop.style.animation = 'none'; shop.offsetHeight; shop.style.animation = 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.05) forwards';
     updateMetaUI();
 }
 
