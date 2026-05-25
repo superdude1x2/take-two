@@ -173,12 +173,14 @@
 
    
 
-    /* Level Up Menu & Upgrades */
+   /* Level Up Menu & Upgrades */
     #upgrade-choices { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; max-width: 800px; padding: 20px; }
-    .upgrade-card { background: rgba(0, 10, 25, 0.9); border: 1px solid rgba(0, 245, 255, 0.3); padding: 15px; width: 220px; cursor: pointer; transition: 0.2s; }
-    .upgrade-card:hover { border-color: var(--cyan); background: rgba(0, 245, 255, 0.1); transform: translateY(-3px); }
-    .upgrade-card h3 { color: var(--cyan); margin-top: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; border-bottom: 1px solid rgba(0,245,255,0.2); padding-bottom: 5px; }
-    .upgrade-card p { font-size: 13px; color: #ccc; line-height: 1.4; margin-bottom: 0; }
+    .upgrade-card { background: rgba(0, 10, 25, 0.9); border: 1px solid rgba(0, 245, 255, 0.3); padding: 15px; width: 220px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+    .upgrade-card:hover { border-color: var(--cyan); background: rgba(0, 245, 255, 0.1); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 245, 255, 0.2); }
+    .upgrade-card h3 { color: var(--cyan); margin-top: 0; font-family: 'Orbitron', sans-serif; font-size: 15px; border-bottom: 1px solid rgba(0,245,255,0.2); padding-bottom: 5px; margin-bottom: 10px; }
+    .upgrade-card p { font-size: 13px; color: #ccc; line-height: 1.4; margin-bottom: 15px; flex-grow: 1; }
+    .upgrade-action { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--green); text-align: center; border-top: 1px dashed rgba(0,255,136,0.3); padding-top: 8px; font-weight: bold; transition: 0.2s;}
+    .upgrade-card:hover .upgrade-action { background: rgba(0, 255, 136, 0.1); }
     .upgrade-card.evolved { border-color: var(--amber); }
     .upgrade-card.evolved h3 { color: var(--amber); border-bottom-color: rgba(255, 170, 0, 0.3); }
     .upgrade-card.evolved:hover { background: rgba(255, 170, 0, 0.1); box-shadow: 0 0 15px rgba(255, 170, 0, 0.3); }
@@ -430,7 +432,8 @@
     </div>
 
 <div id="level-up" class="overlay" style="display: none;">
-    <h2 class="overlay-title" style="color: var(--green);">LEVEL UP</h2>
+    <h2 class="overlay-title" style="color: var(--green); margin-bottom: 5px;">LEVEL UP</h2>
+    <div style="color: var(--cyan); font-size: 14px; margin-bottom: 20px; letter-spacing: 2px; animation: pulse 1.5s infinite;">SELECT A SYSTEM UPGRADE</div>
     <div id="upgrade-choices"></div>
 </div>
 
@@ -580,7 +583,7 @@
     <div id="controls-menu" class="overlay" style="display: none; padding: 25px; min-width: 300px; max-width: 500px; flex-direction: column;">
         <h2 class="overlay-title" style="color: var(--amber); margin-bottom: 15px; text-align: center;">MISSION BRIEFING</h2>
         <div style="background: rgba(0,10,25,0.8); border: 1px solid var(--border); padding: 15px; font-size: 13px; line-height: 1.6; color: #aac; margin-bottom: 20px;">
-            <span style="color: var(--cyan); font-weight: bold;">OBJECTIVE:</span> Survive the swarm. Collect dropped BITS and XP gems. Level up to select new tech and defeat the Dreadnought Bosses to extract permanent upgrades.<br><br>
+            <span style="color: var(--cyan); font-weight: bold;">OBJECTIVE:</span> Survive the swarm. Collect dropped BITS to level up and select, new tech to defeat the Dreadnought Bosses and extract permanent upgrades.<br><br>
             <span style="color: var(--cyan); font-weight: bold;">MOVEMENT:</span> Drag the left joystick.<br><br>
             <span style="color: var(--cyan); font-weight: bold;">COMBAT:</span> Primary weapons auto-fire at the nearest threat. Tap the screen to direct the Neon Beam and Deflector Shield.
         </div>
@@ -2872,11 +2875,22 @@ function checkLevelUpQueue() {
             let currentLvl = uLevels[u.n] || 0; let isEvolved = currentLvl >= 9; 
             let displayColor = isEvolved ? '#fff' : 'rgba(0,245,255,0.6)';
 
-            let evoClass = isDarkSkin() ? ' evolved-dark' : ' evolved';
-            d.className = 'upgrade-card' + (isEvolved ? evoClass : '');
-            d.innerHTML = `<h3>${u.n} <span style="font-size: 9px; float: right; padding-top:2px; color: ${displayColor};">LVL ${currentLvl}</span></h3><p>${u.d}</p>`;
-            
-            d.onclick = () => { 
+           let evoClass = isDarkSkin() ? ' evolved-dark' : ' evolved';
+                d.className = 'upgrade-card' + (isEvolved ? evoClass : '');
+                
+                // Clarify if it's new (Lvl 0->1) or an upgrade
+                let levelText = currentLvl === 0 ? "NEW SYSTEM" : `UPGRADE TO LVL ${currentLvl + 1}`;
+                if (isEvolved) levelText = "EVOLUTION MAXED";
+
+                d.innerHTML = `
+                    <div>
+                        <h3>${u.n} <span style="font-size: 9px; float: right; padding-top:2px; color: ${displayColor};">${levelText}</span></h3>
+                        <p>${u.d}</p>
+                    </div>
+                    <div class="upgrade-action">TAP TO INSTALL</div>
+                `;
+                
+                d.onclick = () => {
                 u.f(); 
                 uLevels[u.n] = (uLevels[u.n] || 0) + 1; 
 
