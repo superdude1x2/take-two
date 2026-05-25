@@ -3125,7 +3125,7 @@ function draw() {
     ctx.fillStyle = '#03040a'; ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (isSlowed > 0) { ctx.fillStyle = 'rgba(180, 0, 255, 0.08)'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+    if (isSlowed > 0) { ctx.fillStyle = 'rgba(180, 0, 255, 0.2)'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
 
     if ((uLevels["MAGNET"] || 0) >= 10) {
         ctx.fillStyle = isDarkSkin() ? 'rgba(255, 0, 51, 0.03)' : 'rgba(255, 215, 0, 0.04)';
@@ -3684,6 +3684,10 @@ window.addEventListener('keyup', e => {
 });
 
 function initGameModeAndStart() {
+    // Attempt to lock portrait orientation
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('portrait').catch(err => console.log("Orientation lock not supported or denied"));
+    }
     document.getElementById('title-screen').style.display = 'none';
     document.getElementById('ui').style.display = 'flex';
     document.getElementById('ability-container').style.display = 'flex';
