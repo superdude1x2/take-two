@@ -474,10 +474,11 @@
             <div style="text-align:center; position:relative; z-index:2; background: rgba(0,4,10,0.8); padding: 10px 15px; border: 1px solid var(--border); width: 85%; box-shadow: 0 0 30px rgba(0,245,255,0.05);">
                 <div id="archive-name" style="font-family:'Orbitron', sans-serif; font-size:20px; font-weight:700; color:var(--cyan); letter-spacing:2px; margin-bottom:5px;">???</div>
                 <div id="archive-desc" style="font-size:12px; color:#aac; line-height:1.5; margin-bottom: 10px;">...</div>
-                <div style="border-top: 1px solid var(--border); width: 100%; margin: 8px 0;"></div>
-                <div style="font-family:'Orbitron', sans-serif; font-size:11px; color:var(--amber); margin-bottom:3px;">EVOLUTION PROTOCOL</div>
-           <div id="archive-evo-desc" style="font-size:11px; color:#ffaa00; line-height:1.4; margin-bottom: 10px;">...</div>
-                <button id="archive-evo-toggle" class="meta-btn" style="width: 100%; padding: 5px; font-size: 10px;" onclick="toggleArchiveEvo()">VIEW EVOLVED</button>
+                <div style="border-top: 1px solid var(--border); width: 100%; margin: 12px 0;"></div>
+                <button id="archive-evo-toggle" class="meta-btn" style="width: 100%; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; border-color: var(--amber); color: var(--amber);" onclick="toggleArchiveEvo()">
+                    <div style="font-family:'Orbitron', sans-serif; font-size:12px; font-weight:bold; letter-spacing:1px;">EVOLUTION PROTOCOL</div>
+                    <div id="archive-evo-status" style="font-size:10px; opacity:0.8;">CLICK TO VIEW</div>
+                </button>
             </div>
         </div>
 
@@ -635,22 +636,22 @@ let hudDataVisible = true;
 
 // -- DATABASES FOR ARCHIVE & BESTIARY --
 const archiveDB = [
-    { id: "REPAIR", name: "STRUCTURAL REPAIR", desc: "Instantly heal 50 Integrity points.", evoDesc: "N/A", hasEvo: false },
-    { id: "PLATING", name: "HULL PLATING", desc: "Increase structural Max HP limits by 20.", evoDesc: "Adds permanent reflective shielding.", hasEvo: true },
-    { id: "THRUSTERS", name: "OVERDRIVE THRUSTERS", desc: "Boost acceleration vectors by +15%.", evoDesc: "Unlocks short-range tactical teleport.", hasEvo: true },
-    { id: "OVERCLOCK", name: "SYSTEM OVERCLOCK", desc: "Fire rate +20% for this run.", evoDesc: "Shots actively lock-on to Boss targets.", hasEvo: true },
-    { id: "MULTISHOT", name: "KINETIC CLUSTER", desc: "Fire an extra lateral bullet with auto lock-on.", evoDesc: "Bullets deal 3x damage.", hasEvo: true },
-    { id: "EXPAND", name: "GRAV EXPANSION", desc: "Orbitals push further out.", evoDesc: "Orbitals occasionally destroy non-boss threats instantly.", hasEvo: true },
-    { id: "ORBITAL", name: "ORBITAL BLADES", desc: "Spawn an additional energy blade to the loop.", evoDesc: "Blades orbit faster and deal 3x damage.", hasEvo: true },
-    { id: "MAGNET", name: "MAGNETIC FIELD", desc: "Expand items collection gravity field by +30px.", evoDesc: "Global pickup range and passive XP gain.", hasEvo: true },
-    { id: "SPIN", name: "CENTRIFUGE DRIVE", desc: "Accelerate blade loop speed and slicing cycles by +30%.", evoDesc: "Orbitals actively deflect incoming projectiles.", hasEvo: true },
-    { id: "PHALANX", name: "PHALANX SHIELD", desc: "Deploy an inverted directional energy shield.", evoDesc: "Reflects projectiles back at enemies.", hasEvo: true },
-    { id: "SUB-SHIELD", name: "SUB-SHIELD", desc: "Add a fast inner counter-rotating barrier node.", evoDesc: "Barriers deal 3x damage.", hasEvo: true },
-    { id: "DRONE", name: "INTERCEPTOR DRONE", desc: "Deploy an additional companion to your tactical fleet.", evoDesc: "Drones deal 3x damage.", hasEvo: true },
-    { id: "NEON BEAM", name: "NEON BEAM", desc: "Unlock/Enhance lagging particle energy pointer tracking.", evoDesc: "Beam deals 3x damage and thickens.", hasEvo: true },
-    { id: "NANO-REGEN", name: "NANO-REGEN", desc: "Initialize or enhance hull auto-repair field by +1.0 HP/sec.", evoDesc: "Doubles active regeneration speed.", hasEvo: true },
-    { id: "VOID ANCHOR", name: "VOID ANCHOR", desc: "Auto-deploy a gravitational singularity every 12s.", evoDesc: "Anchors occasionally crush basic enemies instantly.", hasEvo: true },
-    { id: "COMPACT ENGINE SHIELDING", name: "COMPACT SHIELDING", desc: "Compress hull frame array (-18% Hitbox). Sacrifices -10 Max HP.", evoDesc: "N/A", hasEvo: false }
+    { id: "REPAIR", name: "STRUCTURAL REPAIR", desc: "Instantly heal 50 Integrity points.", evoName: "N/A", evoDesc: "N/A", hasEvo: false },
+    { id: "PLATING", name: "HULL PLATING", desc: "Increase structural Max HP limits by 20.", evoName: "REFLECTIVE CARAPACE", evoDesc: "Adds permanent reflective shielding.", hasEvo: true },
+    { id: "THRUSTERS", name: "OVERDRIVE THRUSTERS", desc: "Boost acceleration vectors by +15%.", evoName: "BLINK DRIVE", evoDesc: "Unlocks short-range tactical teleport.", hasEvo: true },
+    { id: "OVERCLOCK", name: "SYSTEM OVERCLOCK", desc: "Fire rate +20% for this run.", evoName: "SMART-LINK OVERCLOCK", evoDesc: "Shots actively lock-on to Boss targets.", hasEvo: true },
+    { id: "MULTISHOT", name: "KINETIC CLUSTER", desc: "Fire an extra lateral bullet with auto lock-on.", evoName: "KINETIC SWARM", evoDesc: "Bullets deal 3x damage.", hasEvo: true },
+    { id: "EXPAND", name: "GRAV EXPANSION", desc: "Orbitals push further out.", evoName: "GRAV CRUSHER", evoDesc: "Orbitals occasionally destroy non-boss threats instantly.", hasEvo: true },
+    { id: "ORBITAL", name: "ORBITAL BLADES", desc: "Spawn an additional energy blade to the loop.", evoName: "ORBITAL SAWS", evoDesc: "Blades orbit faster and deal 3x damage.", hasEvo: true },
+    { id: "MAGNET", name: "MAGNETIC FIELD", desc: "Expand items collection gravity field by +30px.", evoName: "SINGULARITY FIELD", evoDesc: "Global pickup range and passive XP gain.", hasEvo: true },
+    { id: "SPIN", name: "CENTRIFUGE DRIVE", desc: "Accelerate blade loop speed and slicing cycles by +30%.", evoName: "DEFLECTOR CENTRIFUGE", evoDesc: "Orbitals actively deflect incoming projectiles.", hasEvo: true },
+    { id: "PHALANX", name: "PHALANX SHIELD", desc: "Deploy an inverted directional energy shield.", evoName: "AEGIS PHALANX", evoDesc: "Reflects projectiles back at enemies.", hasEvo: true },
+    { id: "SUB-SHIELD", name: "SUB-SHIELD", desc: "Add a fast inner counter-rotating barrier node.", evoName: "PLASMA BARRIER", evoDesc: "Barriers deal 3x damage.", hasEvo: true },
+    { id: "DRONE", name: "INTERCEPTOR DRONE", desc: "Deploy an additional companion to your tactical fleet.", evoName: "HUNTER-KILLER SQUADRON", evoDesc: "Drones deal 3x damage.", hasEvo: true },
+    { id: "NEON BEAM", name: "NEON BEAM", desc: "Unlock/Enhance lagging particle energy pointer tracking.", evoName: "HEAVY ION BEAM", evoDesc: "Beam deals 3x damage and thickens.", hasEvo: true },
+    { id: "NANO-REGEN", name: "NANO-REGEN", desc: "Initialize or enhance hull auto-repair field by +1.0 HP/sec.", evoName: "NANO-REPLICATOR", evoDesc: "Doubles active regeneration speed.", hasEvo: true },
+    { id: "VOID ANCHOR", name: "VOID ANCHOR", desc: "Auto-deploy a gravitational singularity every 12s.", evoName: "EVENT HORIZON", evoDesc: "Anchors occasionally crush basic enemies instantly.", hasEvo: true },
+    { id: "COMPACT ENGINE SHIELDING", name: "COMPACT SHIELDING", desc: "Compress hull frame array (-18% Hitbox). Sacrifices -10 Max HP.", evoName: "N/A", evoDesc: "N/A", hasEvo: false }
 ];
 
 const bestiaryDB = [
@@ -707,42 +708,63 @@ function renderArchive() {
 function previewArchive(id) {
     previewArchiveId = id;
     viewingEvolvedInArchive = false; // Reset the toggle when clicking a new ability
-    let item = archiveDB.find(a => a.id === id);
-    let isSeen = meta.seenAbils[item.id] && meta.seenAbils[item.id].base;
-    let hasEvoData = meta.seenAbils[item.id] && meta.seenAbils[item.id].evo;
-    
-    document.getElementById('archive-name').innerText = isSeen ? item.name : 'UNKNOWN ABILITY';
-    document.getElementById('archive-desc').innerText = isSeen ? item.desc : 'Combat data missing. Acquire this ability in orbit to reveal its properties.';
-    document.getElementById('archive-evo-desc').innerText = hasEvoData ? item.evoDesc : (item.hasEvo ? 'Evolution data locked.' : 'No known evolution.');
-    
-    let toggleBtn = document.getElementById('archive-evo-toggle');
-    if (hasEvoData) {
-        toggleBtn.disabled = false;
-        toggleBtn.innerText = 'VIEW EVOLVED';
-        toggleBtn.style.opacity = '1';
-        toggleBtn.style.borderColor = 'var(--amber)';
-        toggleBtn.style.color = 'var(--amber)';
-    } else {
-        toggleBtn.disabled = true;
-        toggleBtn.innerText = item.hasEvo ? 'EVOLUTION LOCKED (LVL 10)' : 'NO EVOLUTION';
-        toggleBtn.style.opacity = '0.3';
-        toggleBtn.style.borderColor = 'var(--border)';
-        toggleBtn.style.color = '#aac';
-    }
+    updateArchiveUI();
     renderArchive();
 }
 
 function toggleArchiveEvo() {
     viewingEvolvedInArchive = !viewingEvolvedInArchive;
+    updateArchiveUI();
+}
+
+function updateArchiveUI() {
+    let item = archiveDB.find(a => a.id === previewArchiveId);
+    let isSeen = meta.seenAbils[item.id] && meta.seenAbils[item.id].base;
+    let hasEvoData = meta.seenAbils[item.id] && meta.seenAbils[item.id].evo;
+    
+    let nameEl = document.getElementById('archive-name');
+    let descEl = document.getElementById('archive-desc');
     let toggleBtn = document.getElementById('archive-evo-toggle');
-    if (viewingEvolvedInArchive) {
-        toggleBtn.innerText = 'VIEW NORMAL';
+    let statusEl = document.getElementById('archive-evo-status');
+
+    // Handle unknown/locked base ability
+    if (!isSeen) {
+        nameEl.innerText = 'UNKNOWN ABILITY';
+        nameEl.style.color = '#555';
+        descEl.innerText = 'Combat data missing. Acquire this ability in orbit to reveal its properties.';
+        toggleBtn.disabled = true;
+        toggleBtn.style.opacity = '0.3';
+        toggleBtn.style.borderColor = 'var(--border)';
+        toggleBtn.style.color = '#aac';
+        statusEl.innerText = item.hasEvo ? 'EVOLUTION LOCKED (LVL 10)' : 'NO EVOLUTION AVAILABLE';
+        return;
+    }
+
+    // Toggle logic for acquired abilities
+    if (viewingEvolvedInArchive && hasEvoData) {
+        nameEl.innerText = item.evoName;
+        nameEl.style.color = 'var(--amber)';
+        descEl.innerText = item.evoDesc;
         toggleBtn.style.borderColor = 'var(--cyan)';
         toggleBtn.style.color = 'var(--cyan)';
+        statusEl.innerText = 'VIEWING EVOLVED - CLICK FOR BASE';
     } else {
-        toggleBtn.innerText = 'VIEW EVOLVED';
-        toggleBtn.style.borderColor = 'var(--amber)';
-        toggleBtn.style.color = 'var(--amber)';
+        nameEl.innerText = item.name;
+        nameEl.style.color = 'var(--cyan)';
+        descEl.innerText = item.desc;
+        if (hasEvoData) {
+            toggleBtn.disabled = false;
+            toggleBtn.style.opacity = '1';
+            toggleBtn.style.borderColor = 'var(--amber)';
+            toggleBtn.style.color = 'var(--amber)';
+            statusEl.innerText = 'DATA ACQUIRED - CLICK TO VIEW';
+        } else {
+            toggleBtn.disabled = true;
+            toggleBtn.style.opacity = '0.3';
+            toggleBtn.style.borderColor = 'var(--border)';
+            toggleBtn.style.color = '#aac';
+            statusEl.innerText = item.hasEvo ? 'EVOLUTION LOCKED (LVL 10)' : 'NO EVOLUTION AVAILABLE';
+        }
     }
 }
 
