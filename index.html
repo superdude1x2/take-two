@@ -291,7 +291,7 @@
     .bestiary-theme-btn { border-color: rgba(255,34,85,0.2); }
     .bestiary-theme-btn:hover { background: rgba(255,34,85,0.1); }
     .bestiary-theme-btn.active { border-color: var(--red); background: rgba(255,34,85,0.15); color: white; }
-    .achievement-list-item { display: flex; padding: 15px; border: 1px solid rgba(0,245,255,0.1); margin-bottom: 10px; background: rgba(0,10,25,0.6); align-items: center; }
+  .achievement-list-item { display: flex; padding: 12px; border: 1px solid rgba(0,245,255,0.1); margin-bottom: 10px; background: rgba(0,10,25,0.6); align-items: center; border-radius: 6px; }
     .achievement-list-item.unlocked { border-color: rgba(0,255,136,0.4); background: rgba(0,255,136,0.05); }
     .achiev-icon { font-size: 24px; width: 40px; text-align: center; color: #555; }
     .achievement-list-item.unlocked .achiev-icon { color: var(--green); text-shadow: 0 0 10px var(--green); }
@@ -460,10 +460,12 @@
         <button class="meta-btn" onclick="closeWardrobe()" style="margin-top:15px; align-self:center; width:300px; text-align:center; font-family:'Orbitron', sans-serif; font-size:14px; letter-spacing:3px;">RETURN TO MENU</button>
     </div>
 
-    <div id="achievements-menu" class="overlay" style="width: 75vw; height: 80vh; max-width: 900px; display: none; flex-direction: column;">
-        <h2 class="overlay-title" style="margin:0 0 20px 0; color:var(--amber);">SERVICE RECORD</h2>
-        <div id="achievements-list" class="custom-scroll" style="flex: 1; overflow-y: auto; padding-right: 10px; text-align:left;"></div>
-        <button class="meta-btn" onclick="closeAchievements()" style="margin-top:20px; align-self:center; width:300px; text-align:center; font-family:'Orbitron', sans-serif; font-size:14px; letter-spacing:3px;">RETURN TO MENU</button>
+    <div id="achievements-menu" class="overlay" style="width: 100vw; height: 100vh; display: none; flex-direction: column; padding: 20px; box-sizing: border-box;">
+        <h2 class="overlay-title" style="margin:0 0 15px 0; color:var(--amber);">SERVICE RECORD</h2>
+        <div style="flex: 1; width: 100%; max-width: 800px; background: rgba(0,10,25,0.5); border:1px solid rgba(255,170,0,0.3); border-radius: 8px; display:flex; flex-direction:column; overflow:hidden; padding: 15px; margin: 0 auto; box-sizing: border-box;">
+            <div id="achievements-list" class="custom-scroll" style="flex: 1; overflow-y: auto; padding-right: 10px; text-align:left;"></div>
+        </div>
+        <button class="meta-btn" onclick="closeAchievements()" style="margin-top:15px; align-self:center; width:300px; text-align:center; border-color:var(--amber); color:var(--amber); font-family:'Orbitron', sans-serif; font-size:14px; letter-spacing:3px;">RETURN</button>
     </div>
 
    <div id="archive-menu" class="overlay" style="width: 100vw; height: 100vh; display: none; flex-direction: column; padding: 20px; box-sizing: border-box;">
@@ -1450,11 +1452,14 @@ function renderAchievements() {
         let item = document.createElement('div');
         item.className = 'achievement-list-item ' + (isUnlocked ? 'unlocked' : 'locked');
         
-        item.innerHTML = `
+       item.innerHTML = `
             <div class="achiev-icon">${isUnlocked ? '★' : '🔒'}</div>
             <div class="achiev-details">
-                <div class="achiev-title">${ach.name}</div>
-                <div class="achiev-desc">${ach.desc} <span style="color:var(--cyan); float:right;">${prog.toLocaleString()} / ${ach.max.toLocaleString()}</span></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <div class="achiev-title" style="margin-bottom: 0; font-size: 14px;">${ach.name}</div>
+                    <div style="color:var(--cyan); font-size: 11px; font-weight: bold; white-space: nowrap;">${prog.toLocaleString()} / ${ach.max.toLocaleString()}</div>
+                </div>
+                <div class="achiev-desc" style="line-height: 1.3;">${ach.desc}</div>
                 <div class="achiev-progress-bg">
                     <div class="achiev-progress-fill" style="width: ${pct}%;"></div>
                 </div>
