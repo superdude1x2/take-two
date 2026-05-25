@@ -187,8 +187,48 @@
     .upgrade-card.evolved-dark:hover { background: rgba(255, 34, 85, 0.1); box-shadow: 0 0 15px rgba(255, 34, 85, 0.3); }
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
 
-    /* Mobile Buttons & UI specific */
+ /* Mobile Buttons & UI specific */
     #ability-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 100; }
+
+    #game-controls {
+        position: fixed;
+        bottom: 95px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        z-index: 100;
+    }
+    .ctrl-btn {
+        background: rgba(0, 10, 25, 0.8);
+        border: 1px solid rgba(0, 245, 255, 0.4);
+        color: rgba(0, 245, 255, 0.6);
+        border-radius: 4px;
+        width: 45px;
+        height: 35px;
+        font-family: 'Share Tech Mono', monospace;
+        font-weight: bold;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        transition: all 0.2s;
+    }
+    .ctrl-btn.active {
+        border-color: var(--cyan);
+        color: var(--cyan);
+        background: rgba(0, 245, 255, 0.2);
+        box-shadow: 0 0 10px var(--cyan);
+    }
+    .ctrl-btn.active-stack {
+        border-color: var(--amber);
+        color: var(--amber);
+        background: rgba(255, 170, 0, 0.2);
+        box-shadow: 0 0 10px var(--amber);
+    }
     .ability-ui-box { background: rgba(0, 10, 25, 0.8); border: 1px solid currentColor; padding: 10px; width: 160px; display: none; flex-direction: column; align-items: center; }
     .ability-label { font-size: 12px; margin-bottom: 8px; }
     .ability-track { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); position: relative; }
@@ -358,6 +398,12 @@
             <div id="hp-bar"></div>
             <div id="hp-text">100 / 100</div>
         </div>
+    </div>
+
+    <div id="game-controls" style="display: none;">
+        <button id="btn-ff" class="ctrl-btn" title="Toggle Fast Forward" onclick="toggleFastForward()">&#9654;&#9654;</button>
+        <button id="btn-pause" class="ctrl-btn" title="Toggle Pause" onclick="togglePause()">||</button>
+        <button id="btn-stack" class="ctrl-btn" title="Toggle Upgrade Stacking" onclick="toggleStackUpgrades()">&#9776;</button>
     </div>
 
     <div id="ability-container">
@@ -3468,43 +3514,60 @@ window.addEventListener('mousedown', (e) => {
     }
 });
 
+function togglePause() {
+    if (hp > 0 && pendingLevelUps <= 0 && gameActive && document.getElementById('wardrobe-menu').style.display === 'none' && document.getElementById('achievements-menu').style.display === 'none' && document.getElementById('archive-menu').style.display === 'none' && document.getElementById('bestiary-menu').style.display === 'none') { 
+        gameActive = false; 
+        let po = document.getElementById('pause-overlay');
+        po.style.display = 'block'; 
+        po.style.animation = 'none'; po.offsetHeight; po.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards';
+        document.getElementById('btn-pause').classList.add('active');
+        playSound(400, 'sine', 0.1, 0.05, 200); 
+    } 
+    else if (document.getElementById('pause-overlay').style.display === 'block') { 
+        gameActive = true; document.getElementById('pause-overlay').style.display = 'none'; 
+        document.getElementById('btn-pause').classList.remove('active');
+        playSound(600, 'sine', 0.1, 0.05, 800); 
+    }
+}
+
+function toggleFastForward() {
+    if (!gameActive && document.getElementById('pause-overlay').style.display !== 'block') return;
+    fastForward = !fastForward;
+    let btn = document.getElementById('btn-ff');
+    if(fastForward) btn.classList.add('active');
+    else btn.classList.remove('active');
+    playSound(300, 'square', 0.1, 0.1, 400);
+}
+
+function toggleStackUpgrades() {
+    stackUpgrades = !stackUpgrades;
+    let btn = document.getElementById('btn-stack');
+    if(stackUpgrades) btn.classList.add('active-stack');
+    else btn.classList.remove('active-stack');
+    playSound(400, 'square', 0.1, 0.1, 500);
+}
+
 window.addEventListener('keydown', e => { 
     if(!audioCtx && gameActive) startAudio(); 
     
-  if (e.code === 'KeyL' && gameActive) {
+    if (e.code === 'KeyL' && gameActive) {
         e.preventDefault();
-        
     }
-    
-    
 
     if (e.code === 'Escape') { 
-        if (hp > 0 && pendingLevelUps <= 0 && gameActive && document.getElementById('wardrobe-menu').style.display === 'none' && document.getElementById('achievements-menu').style.display === 'none' && document.getElementById('archive-menu').style.display === 'none' && document.getElementById('bestiary-menu').style.display === 'none') { 
-            gameActive = false; 
-          let po = document.getElementById('pause-overlay');
-po.style.display = 'flex';
-            po.style.display = 'block'; 
-            po.style.animation = 'none'; po.offsetHeight; po.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards';
-            playSound(400, 'sine', 0.1, 0.05, 200); 
-        } 
-        else if (document.getElementById('pause-overlay').style.display === 'block') { 
-            gameActive = true; document.getElementById('pause-overlay').style.display = 'none'; 
-            playSound(600, 'sine', 0.1, 0.05, 800); 
-        } 
-        else if (document.getElementById('wardrobe-menu').style.display !== 'none') { closeWardrobe(); }
+        if (document.getElementById('wardrobe-menu').style.display !== 'none') { closeWardrobe(); }
         else if (document.getElementById('achievements-menu').style.display !== 'none') { closeAchievements(); }
         else if (document.getElementById('archive-menu').style.display !== 'none') { closeArchive(); }
         else if (document.getElementById('bestiary-menu').style.display !== 'none') { closeBestiary(); }
+        else { togglePause(); }
     }
 
     if (e.code === 'KeyF' && gameActive) {
-        fastForward = !fastForward;
-        playSound(300, 'square', 0.1, 0.1, 400);
+        toggleFastForward();
     }
     
     if (e.code === 'KeyT' && gameActive) {
-        stackUpgrades = !stackUpgrades;
-        playSound(400, 'square', 0.1, 0.1, 500);
+        toggleStackUpgrades();
     }
 
     if (e.code === 'Space' && meta.unlockedDash && gameActive && dashCD <= 0) {
@@ -3540,6 +3603,7 @@ function initGameModeAndStart() {
     document.getElementById('title-screen').style.display = 'none';
     document.getElementById('ui').style.display = 'flex';
     document.getElementById('ability-container').style.display = 'flex';
+    document.getElementById('game-controls').style.display = 'flex';
     document.getElementById('xp-bar-container').style.display = 'block';
     applyMode();
     restartGame();
@@ -3552,6 +3616,7 @@ function quitToTitle() {
     document.getElementById('title-screen').style.display = 'flex';
     document.getElementById('ui').style.display = 'none';
     document.getElementById('ability-container').style.display = 'none';
+    document.getElementById('game-controls').style.display = 'none';
     document.getElementById('xp-bar-container').style.display = 'none';
     if(audioCtx && audioCtx.state !== 'closed') { audioCtx.suspend(); }
 }
@@ -3585,7 +3650,10 @@ function restartGame() {
     deflectorLevel = 0; anchorLevel = 0; anchorTimer = 0; activeAnchors = [];
     uLevels = {}; forceChoiceQueue = [];
     
-    dashCD = 0; slowCD = 0; empCD = 0; teleportCD = 0; isDashing = 0; isSlowed = 0; visualEmpRing = 0; fastForward = false; stackUpgrades = false;
+   dashCD = 0; slowCD = 0; empCD = 0; teleportCD = 0; isDashing = 0; isSlowed = 0; visualEmpRing = 0; fastForward = false; stackUpgrades = false;
+    document.getElementById('btn-ff').classList.remove('active');
+    document.getElementById('btn-pause').classList.remove('active');
+    document.getElementById('btn-stack').classList.remove('active-stack');
     
     ['multishot-log', 'beam-log', 'drone-log', 'regen-log', 'boss-log'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).style.display = 'none'; });
     updateUI(); startAudio(); gameActive = true;
