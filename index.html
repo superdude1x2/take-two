@@ -63,7 +63,7 @@
 
     .joy-zone {
         position: absolute;
-        bottom: 125px; /* Baseline */
+        bottom: 150px; /* Baseline */
         left: 40px;
         width: 130px; 
         height: 130px;
@@ -244,7 +244,7 @@
 /* Container for the button group */
 #mobile-abilities {
     position: absolute;
-    bottom: 120px;
+    bottom: 145px;
     right: 40px;
     display: grid;
     grid-template-columns: 65px 65px; /* Two columns */
@@ -568,10 +568,32 @@
         </div>
     </div>
 
-    <div id="pause-overlay" class="overlay" style="padding: 25px 40px; min-width: 300px;">
-        <h2 class="overlay-title" style="color: var(--cyan); margin: 0; letter-spacing: 8px;">SYSTEM PENDING</h2>
-        <p style="font-size: 13px; color: rgba(170,200,255,0.6); margin: 12px 0 0 0;">PRESS [ ESC ] TO RESUME DRIVE</p>
-        <button class="meta-btn meta-btn-danger" onclick="quitToTitle()" style="margin-top: 20px; font-size: 13px; padding: 10px 16px; width: 100%;">QUIT TO TITLE</button>
+   <div id="pause-overlay" class="overlay" style="display: none; padding: 25px 40px; min-width: 300px; flex-direction: column; gap: 10px;">
+        <h2 class="overlay-title" style="color: var(--cyan); margin: 0; letter-spacing: 8px; text-align: center;">SYSTEM PENDING</h2>
+        <p style="font-size: 13px; color: rgba(170,200,255,0.6); margin: 5px 0 15px 0; text-align: center;">PRESS [ ESC ] TO RESUME DRIVE</p>
+        <button class="meta-btn" onclick="togglePause()" style="font-size: 13px; padding: 10px 16px; width: 100%; border-color: var(--green); color: var(--green);">RESUME DRIVE</button>
+        <button class="meta-btn" onclick="openControlsMenu()" style="font-size: 13px; padding: 10px 16px; width: 100%;">CONTROLS & GOALS</button>
+        <button class="meta-btn" onclick="openOptionsMenu()" style="font-size: 13px; padding: 10px 16px; width: 100%;">SYSTEM OPTIONS</button>
+        <button class="meta-btn meta-btn-danger" onclick="quitToTitle()" style="margin-top: 10px; font-size: 13px; padding: 10px 16px; width: 100%;">QUIT TO TITLE</button>
+    </div>
+
+    <div id="controls-menu" class="overlay" style="display: none; padding: 25px; min-width: 300px; max-width: 500px; flex-direction: column;">
+        <h2 class="overlay-title" style="color: var(--amber); margin-bottom: 15px; text-align: center;">MISSION BRIEFING</h2>
+        <div style="background: rgba(0,10,25,0.8); border: 1px solid var(--border); padding: 15px; font-size: 13px; line-height: 1.6; color: #aac; margin-bottom: 20px;">
+            <span style="color: var(--cyan); font-weight: bold;">OBJECTIVE:</span> Survive the swarm. Collect dropped BITS and XP gems. Level up to select new tech and defeat the Dreadnought Bosses to extract permanent upgrades.<br><br>
+            <span style="color: var(--cyan); font-weight: bold;">MOVEMENT:</span> Drag the left joystick (Mobile) or use W,A,S,D / Arrow Keys (PC).<br><br>
+            <span style="color: var(--cyan); font-weight: bold;">COMBAT:</span> Primary weapons auto-fire at the nearest threat. Tap the screen (or aim with mouse) to direct the Neon Beam and Deflector Shield.
+        </div>
+        <button class="meta-btn" onclick="closeControlsMenu()" style="width: 100%;">RETURN TO PAUSE</button>
+    </div>
+
+    <div id="options-menu" class="overlay" style="display: none; padding: 25px; min-width: 300px; max-width: 400px; flex-direction: column;">
+        <h2 class="overlay-title" style="color: var(--cyan); margin-bottom: 20px; text-align: center;">SYSTEM OPTIONS</h2>
+        <div style="margin-bottom: 20px; text-align: center; width: 100%;">
+            <label for="master-volume" style="display: block; font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--cyan); margin-bottom: 15px;">MASTER AUDIO: <span id="vol-display" style="color: #fff;">50%</span></label>
+            <input type="range" id="master-volume" min="0" max="100" value="50" style="width: 100%; accent-color: var(--cyan);" oninput="updateMasterVolume(this.value)">
+        </div>
+        <button class="meta-btn" onclick="closeOptionsMenu()" style="width: 100%;">RETURN TO PAUSE</button>
     </div>
 
 <div id="title-screen">
@@ -1740,18 +1762,43 @@ function clearMetaCache() {
 }
 
 let audioCtx;
+window.masterVolume = 0.5; // Starts at 50%
+
 const playSound = (freq, type, duration, vol, slide = 10) => {
-    if(!audioCtx || audioCtx.state === 'suspended') return;
+    if(!audioCtx || audioCtx.state === 'suspended' || window.masterVolume <= 0) return;
     try {
         const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
         osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(slide, audioCtx.currentTime + duration);
-        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        g.gain.setValueAtTime(vol * window.masterVolume, audioCtx.currentTime);
         g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
         osc.connect(g); g.connect(audioCtx.destination);
         osc.start(); osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
 };
+
+// UI Toggle Logic for Options and Controls
+function openControlsMenu() {
+    document.getElementById('pause-overlay').style.display = 'none';
+    document.getElementById('controls-menu').style.display = 'flex';
+}
+function closeControlsMenu() {
+    document.getElementById('controls-menu').style.display = 'none';
+    document.getElementById('pause-overlay').style.display = 'flex';
+}
+function openOptionsMenu() {
+    document.getElementById('pause-overlay').style.display = 'none';
+    document.getElementById('options-menu').style.display = 'flex';
+}
+function closeOptionsMenu() {
+    document.getElementById('options-menu').style.display = 'none';
+    document.getElementById('pause-overlay').style.display = 'flex';
+}
+function updateMasterVolume(val) {
+    window.masterVolume = val / 100;
+    document.getElementById('vol-display').innerText = val + '%';
+    playSound(400, 'square', 0.1, 0.1, 500); // Feedback blip
+}
 
 function updateUI() {
     // 1. Update Main HUD Elements
@@ -3518,12 +3565,13 @@ function togglePause() {
     if (hp > 0 && pendingLevelUps <= 0 && gameActive && document.getElementById('wardrobe-menu').style.display === 'none' && document.getElementById('achievements-menu').style.display === 'none' && document.getElementById('archive-menu').style.display === 'none' && document.getElementById('bestiary-menu').style.display === 'none') { 
         gameActive = false; 
         let po = document.getElementById('pause-overlay');
-        po.style.display = 'block'; 
+        po.style.display = 'flex'; 
         po.style.animation = 'none'; po.offsetHeight; po.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards';
         document.getElementById('btn-pause').classList.add('active');
         playSound(400, 'sine', 0.1, 0.05, 200); 
     } 
-    else if (document.getElementById('pause-overlay').style.display === 'block') { 
+    else if (document.getElementById('pause-overlay').style.display === 'flex' || document.getElementById('pause-overlay').style.display === 'block') {
+    document.getElementById('pause-overlay').style.display = 'none';
         gameActive = true; document.getElementById('pause-overlay').style.display = 'none'; 
         document.getElementById('btn-pause').classList.remove('active');
         playSound(600, 'sine', 0.1, 0.05, 800); 
@@ -3613,6 +3661,8 @@ function quitToTitle() {
     gameActive = false;
     document.getElementById('meta-shop').style.display = 'none';
     document.getElementById('pause-overlay').style.display = 'none';
+    if(document.getElementById('controls-menu')) document.getElementById('controls-menu').style.display = 'none';
+    if(document.getElementById('options-menu')) document.getElementById('options-menu').style.display = 'none';
     document.getElementById('title-screen').style.display = 'flex';
     document.getElementById('ui').style.display = 'none';
     document.getElementById('ability-container').style.display = 'none';
@@ -3671,7 +3721,11 @@ function startAudio() {
             if (isSlowed > 0) note /= 2;
             if (fastForward) note *= 1.5;
             osc.frequency.setValueAtTime(note, now);
-            osc.type = 'sawtooth'; g.gain.setValueAtTime(0.015, now); g.gain.exponentialRampToValueAtTime(0.001, now + (fastForward ? 0.09 : 0.18));
+            osc.type = 'sawtooth'; 
+            // Scale background music to master volume
+            let baseMusicVol = 0.015 * (window.masterVolume || 0);
+            g.gain.setValueAtTime(baseMusicVol, now); 
+            g.gain.exponentialRampToValueAtTime(0.0001, now + (fastForward ? 0.09 : 0.18));
             osc.connect(g); g.connect(audioCtx.destination);
             osc.start(now); osc.stop(now + (fastForward ? 0.09 : 0.18));
             setTimeout(musicLoop, fastForward ? 125 : 250);
