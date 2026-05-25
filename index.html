@@ -382,6 +382,45 @@
         letter-spacing: 1px;
         text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
     }
+
+    /* --- FULLSCREEN MODE OVERRIDES --- */
+    body.fullscreen-mode #canvas-wrap {
+        top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        border: none !important; border-radius: 0 !important;
+        z-index: 0;
+    }
+    
+    body.fullscreen-mode #ability-container { display: none !important; }
+    
+    body.fullscreen-mode #joy-right {
+        display: flex !important;
+        right: 40px; left: auto;
+    }
+    
+    body.fullscreen-mode #mobile-abilities {
+        bottom: 150px; right: 40px;
+        width: 130px; height: 130px;
+        display: block;
+    }
+    
+    body.fullscreen-mode .mob-btn {
+        position: absolute;
+        width: 48px; height: 48px; font-size: 9px;
+        border-width: 1px;
+        color: #fff !important;
+    }
+    
+    body.fullscreen-mode #mob-dash { top: -15px; left: 15px; }
+    body.fullscreen-mode #mob-slow { top: 41px; left: -30px; }
+    body.fullscreen-mode #mob-emp { top: 97px; left: 15px; margin-top: 0; }
+    
+    body.fullscreen-mode #game-controls {
+        bottom: 50%; right: 15px; left: auto;
+        transform: translateY(50%);
+        flex-direction: column;
+        gap: 15px;
+    }
 </style>
 </head>
 <body>
@@ -613,7 +652,7 @@
                 <div class="mode-container-grid">
                     <button class="meta-btn btn-span-2" id="btn-classic" onclick="setMode('CLASSIC')" style="border-color: var(--cyan); color: var(--cyan); background: rgba(0,245,255,0.1);">CLASSIC ENGAGEMENT</button>
                     <button class="meta-btn btn-span-2" id="btn-colosseum" onclick="setMode('COLOSSEUM')">COLOSSEUM</button>
-                    <button class="meta-btn" id="btn-fullscreen" onclick="setMode('FULLSCREEN')" style="display:none;">FULL SCREEN</button>
+                   <button class="meta-btn" id="btn-fullscreen" onclick="setMode('FULLSCREEN')">FULL SCREEN</button>
                     <button class="meta-btn" id="btn-corners" onclick="setMode('CORNERS')" style="display:none;">CORNERS</button>
                     <button class="meta-btn" id="btn-maze" onclick="setMode('MAZE')" style="display:none;">MAZE</button>
                 </div>
@@ -645,6 +684,9 @@
 <div id="mobile-ui">
         <div id="joy-left" class="joy-zone">
             <div id="knob-left" class="joy-knob"></div>
+        </div>
+        <div id="joy-right" class="joy-zone" style="display: none;">
+            <div id="knob-right" class="joy-knob"></div>
         </div>
         
       <div id="mobile-abilities">
@@ -1269,9 +1311,19 @@ function applyMode() {
     const wrap = document.getElementById('canvas-wrap');
     const ui = document.getElementById('ui');
     
-    // Scaling up internal resolution to act as a camera zoom-out
-    canvas.width = wrap.clientWidth * ZOOM_FACTOR;
-    canvas.height = wrap.clientHeight * ZOOM_FACTOR;
+    if (currentMode === 'FULLSCREEN') {
+        document.body.classList.add('fullscreen-mode');
+        canvas.width = window.innerWidth * ZOOM_FACTOR;
+        canvas.height = window.innerHeight * ZOOM_FACTOR;
+        wrap.style.top = "0"; wrap.style.left = "0";
+        wrap.style.width = "100vw"; wrap.style.height = "100vh";
+    } else {
+        document.body.classList.remove('fullscreen-mode');
+        wrap.style.width = ""; wrap.style.height = "";
+        wrap.style.top = ""; wrap.style.left = "";
+        canvas.width = wrap.clientWidth * ZOOM_FACTOR;
+        canvas.height = wrap.clientHeight * ZOOM_FACTOR;
+    }
     
     ui.style.width = 'calc(100% - 40px)';
     ui.style.left = '50%';
@@ -1811,33 +1863,64 @@ function updateUI() {
     document.getElementById('hp-text').innerText = Math.ceil(Math.max(0, hp)) + ' / ' + maxHp;
     document.getElementById('xp-bar').style.width = Math.min(100, (xp / nextXp) * 100) + '%';
 
-    // 2. Update PC Cooldown Bars (if unlocked)
-    if (meta.unlockedDash && document.getElementById('ui-dash')) {
-        document.getElementById('ui-dash').style.display = 'flex';
-        document.getElementById('dash-bar').style.width = Math.max(0, 100 - (dashCD / DASH_MAX * 100)) + '%';
-        document.getElementById('dash-bar').style.background = dashCD <= 0 ? 'var(--cyan)' : 'rgba(0, 245, 255, 0.2)';
-    }
-    if (meta.unlockedSlow && document.getElementById('ui-slow')) {
-        document.getElementById('ui-slow').style.display = 'flex';
-        document.getElementById('slow-bar').style.width = Math.max(0, 100 - (slowCD / SLOW_MAX * 100)) + '%';
-        document.getElementById('slow-bar').style.background = slowCD <= 0 ? 'var(--purple)' : 'rgba(180, 0, 255, 0.2)';
-    }
-    if (meta.unlockedEmp && document.getElementById('ui-emp')) {
-        document.getElementById('ui-emp').style.display = 'flex';
-        document.getElementById('emp-bar').style.width = Math.max(0, 100 - (empCD / EMP_MAX * 100)) + '%';
-        document.getElementById('emp-bar').style.background = empCD <= 0 ? 'var(--red)' : 'rgba(255, 34, 85, 0.2)';
-    }
+    // 2. Update PC Cooldown Bars & Mobile Button Displays
+    let dashPct = Math.max(0, 100 - (dashCD / DASH_MAX * 100));
+    let slowPct = Math.max(0, 100 - (slowCD / SLOW_MAX * 100));
+    let empPct = Math.max(0, 100 - (empCD / EMP_MAX * 100));
 
-    // 3. Sync Mobile Buttons Display
-    if (document.getElementById('mob-dash')) {
-        document.getElementById('mob-dash').style.display = meta.unlockedDash ? 'flex' : 'none';
-    }
-    if (document.getElementById('mob-slow')) {
-        document.getElementById('mob-slow').style.display = meta.unlockedSlow ? 'flex' : 'none';
-    }
-    if (document.getElementById('mob-emp')) {
-        document.getElementById('mob-emp').style.display = meta.unlockedEmp ? 'flex' : 'none';
-    }
+    if (meta.unlockedDash) {
+        if (document.getElementById('ui-dash')) {
+            document.getElementById('dash-bar').style.width = dashPct + '%';
+            document.getElementById('dash-bar').style.background = dashCD <= 0 ? 'var(--cyan)' : 'rgba(0, 245, 255, 0.2)';
+        }
+        let mDash = document.getElementById('mob-dash');
+        if (mDash) {
+            mDash.style.display = 'flex';
+            if (currentMode === 'FULLSCREEN') {
+                mDash.style.background = dashCD <= 0 ? 'var(--cyan)' : `conic-gradient(var(--cyan) ${dashPct}%, rgba(0, 10, 25, 0.3) ${dashPct}%)`;
+                mDash.style.opacity = dashCD <= 0 ? '1' : '0.4';
+            } else {
+                mDash.style.background = 'rgba(0, 10, 25, 0.7)';
+                mDash.style.opacity = '1';
+            }
+        }
+    } else if (document.getElementById('mob-dash')) { document.getElementById('mob-dash').style.display = 'none'; }
+    
+    if (meta.unlockedSlow) {
+        if (document.getElementById('ui-slow')) {
+            document.getElementById('slow-bar').style.width = slowPct + '%';
+            document.getElementById('slow-bar').style.background = slowCD <= 0 ? 'var(--purple)' : 'rgba(180, 0, 255, 0.2)';
+        }
+        let mSlow = document.getElementById('mob-slow');
+        if (mSlow) {
+            mSlow.style.display = 'flex';
+            if (currentMode === 'FULLSCREEN') {
+                mSlow.style.background = slowCD <= 0 ? 'var(--purple)' : `conic-gradient(var(--purple) ${slowPct}%, rgba(0, 10, 25, 0.3) ${slowPct}%)`;
+                mSlow.style.opacity = slowCD <= 0 ? '1' : '0.4';
+            } else {
+                mSlow.style.background = 'rgba(0, 10, 25, 0.7)';
+                mSlow.style.opacity = '1';
+            }
+        }
+    } else if (document.getElementById('mob-slow')) { document.getElementById('mob-slow').style.display = 'none'; }
+    
+    if (meta.unlockedEmp) {
+        if (document.getElementById('ui-emp')) {
+            document.getElementById('emp-bar').style.width = empPct + '%';
+            document.getElementById('emp-bar').style.background = empCD <= 0 ? 'var(--red)' : 'rgba(255, 34, 85, 0.2)';
+        }
+        let mEmp = document.getElementById('mob-emp');
+        if (mEmp) {
+            mEmp.style.display = 'flex';
+            if (currentMode === 'FULLSCREEN') {
+                mEmp.style.background = empCD <= 0 ? 'var(--red)' : `conic-gradient(var(--red) ${empPct}%, rgba(0, 10, 25, 0.3) ${empPct}%)`;
+                mEmp.style.opacity = empCD <= 0 ? '1' : '0.4';
+            } else {
+                mEmp.style.background = 'rgba(0, 10, 25, 0.7)';
+                mEmp.style.opacity = '1';
+            }
+        }
+    } else if (document.getElementById('mob-emp')) { document.getElementById('mob-emp').style.display = 'none'; }
 }
 
 let score = 0, level = 1, xp = 0, nextXp = 5, gameActive = false, frameCount = 0;
@@ -2247,7 +2330,11 @@ function update() {
     let currentDeflectorAngle = 0;
     let currentDefArc = 0;
     if (deflectorLevel > 0) {
-        currentDeflectorAngle = Math.atan2(mouseY - player.y, mouseX - player.x) + Math.PI;
+        if (currentMode === 'FULLSCREEN' && stickRight.active) {
+            currentDeflectorAngle = Math.atan2(stickRight.y, stickRight.x) + Math.PI;
+        } else {
+            currentDeflectorAngle = Math.atan2(mouseY - player.y, mouseX - player.x) + Math.PI;
+        }
         currentDefArc = Math.PI / 2 + (deflectorLevel * 0.1);
     }
 
@@ -2377,7 +2464,9 @@ function update() {
 
     let beamRange = 0, targetX = 0, targetY = 0, baseWidth = 0;
     if (beamLevel > 0) {
-        let mouseAngle = Math.atan2(mouseY - player.y, mouseX - player.x);
+        let mouseAngle = (currentMode === 'FULLSCREEN' && stickRight.active)
+            ? Math.atan2(stickRight.y, stickRight.x)
+            : Math.atan2(mouseY - player.y, mouseX - player.x);
         let diff = mouseAngle - currentBeamAngle;
         while (diff < -Math.PI) diff += Math.PI * 2;
         while (diff > Math.PI) diff -= Math.PI * 2;
@@ -3868,9 +3957,10 @@ function setupJoystick(zoneId, knobId, stickData) {
     }
 }
 
-// Initialize SINGLE Left Joystick
+// Initialize Dual Joysticks
+let stickRight = { x: 0, y: 0, active: false };
 setupJoystick('joy-left', 'knob-left', stickLeft);
-
+setupJoystick('joy-right', 'knob-right', stickRight);
 
 // Mobile Ability Buttons
 document.getElementById('mob-dash').addEventListener('touchstart', (e) => {
